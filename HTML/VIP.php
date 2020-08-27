@@ -1,4 +1,3 @@
-<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
     <title>Games Seek : VIP</title>
@@ -39,7 +38,7 @@
                 <div class="w3-container w3-black">
                     <h1>Inscrivez-vous !</h1> 
                         <p>Pour avoir des offres spécial et accès au service VIP</p>
-                        <a href="register.php" class="w3-button w3-red w3-margin-bottom">S'abonner</a>
+                        <a href="login.php" class="w3-button w3-red w3-margin-bottom">S'abonner</a>
                 </div>
 
                 <div class="w3-padding-64 w3-light-grey w3-small w3-center" id="footer">

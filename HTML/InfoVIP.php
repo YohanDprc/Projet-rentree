@@ -1,4 +1,3 @@
-<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
     <title>Games Seek : VIP Info</title>

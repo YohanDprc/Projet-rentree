@@ -1,48 +1,76 @@
-<?php session_start(); ?>
 <?php
+
+session_start();
+
+require_once '../HTML/Function.php';
+    
+try
+    {
+       $bdd = new PDO(
+          'mysql:host=localhost;dbname=amirtagram',
+          "root",
+          "",
+          array(
+             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+             PDO::ATTR_EMULATE_PREPARES => false
+          )
+       );
+    }
+    catch(Exception $e)
+    {
+            die('Erreur : '.$e->getMessage());
+    }
+
+$filterNom = filter_input(INPUT_POST, 'Nom', FILTER_SANITIZE_STRING);
+$filterEmail = filter_input(INPUT_POST, 'Email', FILTER_SANITIZE_STRING);
+$filterObjet = filter_input(INPUT_POST, 'Objet', FILTER_SANITIZE_STRING);
+$filterMessage = filter_input(INPUT_POST, 'Message', FILTER_SANITIZE_STRING);
+
+$varNom = filter_var($filterNom, FILTER_SANITIZE_STRING);
+$varEmail = filter_var($filterEmail, FILTER_VALIDATE_EMAIL);
+$varObjet = filter_var($filterObjet, FILTER_SANITIZE_STRING);
+$varMessage = filter_var($filterMessage, FILTER_SANITIZE_STRING);
+
+$arrayNom = array($varNom);
+$arrayEmail = array($varEmail);
+
 if (!empty($_POST)) {
-
-    require '../HTML/Function.php';
     $errors = array();
-    require_once '../HTML/db.php';
 
-    if (empty($_POST["Nom"]) || !preg_match("/^[a-zA-Z0-9_]+$/", $_POST["Nom"])) {
-
+    if (empty($varNom) || !preg_match("/^[a-zA-Z0-9_]+$/", $varNom)) {
         $errors["Nom"] = "Votre pseudo est invalide ! (alphanumérique)";
     } else {
-        $req = $pdo->prepare("SELECT idEnregistrement FROM suggestion WHERE username = ?");
-        $req->execute([$_POST["Nom"]]);
+        $req = $bdd->prepare("SELECT idEnregistrement FROM suggestion WHERE username = ?");
+        $req->execute($arrayNom);
         $user = $req->fetch();
         if ($user) {
             $errors["username"] = "Ce pseudo est déjà pris";
         }
     }
 
-    if (empty($_POST["Email"]) || !filter_var($_POST["Email"], FILTER_VALIDATE_EMAIL)) {
-
+    if (empty($varEmail) || !filter_var($varEmail, FILTER_VALIDATE_EMAIL)) {
         $errors["Email"] = "Votre email est invalide ! (alphanumérique)";
     } else {
-        $req = $pdo->prepare("SELECT idEnregistrement FROM suggestion WHERE email = ?");
-        $req->execute([$_POST["Email"]]);
+        $req = $bdd->prepare("SELECT idEnregistrement FROM suggestion WHERE email = ?");
+        $req->execute($arrayEmail);
         $user = $req->fetch();
         if ($user) {
             $errors["email"] = "Cet email est déjà utilisé pour un autre compte";
         }
     }
 
-    if (empty($_POST["Objet"]) || !preg_match("/^[a-zA-Z0-9' ]+$/", $_POST["Objet"])) {
-
+    if (empty($varObjet) || !preg_match("/^[a-zA-Z0-9', ]+$/", $varObjet)) {
         $errors["Objet"] = "Votre objet est invalide ! (alphanumérique)";
     }
 
-    if (empty($_POST["Message"]) || !preg_match("/^[a-zA-Z0-9' ]+$/", $_POST["Message"])) {
-
+    if (empty($varMessage) || !preg_match("/^[a-zA-Z0-9', ]+$/", $varMessage)) {
         $errors["Message"] = "Votre message est invalide ! (alphanumérique)";
     }
 
+       
     if (empty($errors)) {
-        $rep = $pdo->prepare("INSERT INTO suggestion SET username = ?, email = ?, objet = ?, message = ?");
-        $rep->execute([$_POST["Nom"], $_POST["Email"], $_POST["Objet"], $_POST["Message"]]);
+        $rep = $bdd->prepare("INSERT INTO suggestion SET username = ?, email = ?, objet = ?, message = ?");
+        $rep->execute(array($varNom, $varEmail, $varObjet, $varMessage));
     }
 }
 ?>

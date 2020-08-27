@@ -1,21 +1,108 @@
-<?php session_start(); ?>
 <?php
-if (!empty($_POST) && !empty($_POST['NomComplet']) && !empty($_POST['Password'])){
-        require_once '../HTML/db.php';
-        require_once '../HTML/Function.php';
-        $req = $pdo->prepare('SELECT * FROM inscription WHERE nomComplet = :nomComplet OR email = :nomComplet');
-        $req->execute(['NomComplet' => $_POST['NomComplet']]);
-        $user = $req->fetch();
-        if(password_verify($_POST['Password'], $user->password)){
-            $_SESSION['auth'] = $user;
-            $_SESSION['flash']['sucess'] = 'bravo';
-            header('Location: Accueil.php');
-            exit;
-        }else{
-           $_SESSION['flash']['danger'] = 'pas juste'; 
-        }
-        
+session_start();
+
+    try
+    {
+       $bdd = new PDO(
+          'mysql:host=localhost;dbname=amirtagram',
+          "root",
+          "",
+          array(
+             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+             PDO::ATTR_EMULATE_PREPARES => false
+          )
+       );
+    }
+    catch(Exception $e)
+    {
+            die('Erreur : '.$e->getMessage());
+    }
+
+//Création des variables de la session
+if(!isset($_SESSION['userList'])){
+    $_SESSION['pseudo'] = "";
+    $_SESSION['isConnected'] = false;
+    $_SESSION['password'] = [];
+  }
+
+//Récuperation des données
+
+$action = filter_input(INPUT_POST,"action");
+$pseudo = filter_input(INPUT_POST,"pseudo");
+$password = filter_input(INPUT_POST,"password");
+//-------------------------------------------------
+
+$message = "";
+
+
+if($action == "connect"){
+  
+  if($pseudo != "" && $password != ""){
+    $sql = "SELECT * FROM user";
+    $reponse = $bdd->prepare($sql);
+    $reponse->execute();
+
+
+
+
+
+    if (($res = $reponse->fetch()) == false) {
+      echo "lol";
+  } else {
+      do {
+          if($pseudo == $res['pseudo'] && $password == $res['password']){
+            $_SESSION['pseudo'] = $res['pseudo'];
+            $_SESSION['isConnected'] = true;
+            $_SESSION['password'] = $res['password'];
+            $_SESSION['userId'] = $res['iduser'];
+
+            $repConnect = $bdd->prepare('UPDATE user SET isConnected = true WHERE iduser = :userId');
+            $repConnect->execute(array(
+              'userId' => $_SESSION['userId']
+              ));
+
+            header("Location: http://localhost/projects/SitePHP/Accueil.php");
+
+          }
+          else{
+            $message = "Entrée inorrect";
+          }
+      } while ($res = $reponse->fetch());
+  }
+  }
+  else{
+    $message = "Entrée inorrect";
+  }
+  
 }
+else if($action == "register"){
+
+
+
+  if($pseudo != "" && $password != ""){
+    $req = $bdd->prepare('SELECT pseudo FROM user WHERE pseudo= :Pseudo');
+
+    $req->execute(array(
+      'Pseudo' => $pseudo,
+      ));
+    
+    if ($donnees = $req->fetch())
+    {
+        $message = "Il y a déjà une personne qui utilise $pseudo comme pseudo !";
+    }
+    else
+    {
+      $req = $bdd->prepare('INSERT INTO user(pseudo, password) VALUES(:pseudo, :password)');
+    
+      $req->execute(array(
+        'pseudo' => $pseudo,
+        'password' => $password
+        ));
+        $message = "Compte crée";
+    }
+}
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -64,9 +151,9 @@ if (!empty($_POST) && !empty($_POST['NomComplet']) && !empty($_POST['Password'])
                 <div class="card-body login-card-body">
                     <p class="login-box-msg">Connexion à un compte</p>
 
-                    <form action="" method="post">
+                    <form id="login" action="" method="post">
                         <div class="input-group mb-3">
-                            <input type="email" class="form-control" placeholder="Email" required="required">
+                            <input type="text" class="form-control" name="pseudo" placeholder="Pseudo" required="required">
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-envelope"></span>
@@ -74,7 +161,7 @@ if (!empty($_POST) && !empty($_POST['NomComplet']) && !empty($_POST['Password'])
                             </div>
                         </div>
                         <div class="input-group mb-3">
-                            <input type="password" class="form-control" placeholder="Mot de passe" required="required">
+                            <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Mot de passe" required="required">
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fas fa-lock"></span>
@@ -84,6 +171,7 @@ if (!empty($_POST) && !empty($_POST['NomComplet']) && !empty($_POST['Password'])
                         <div class="row">
                             <div class="col-8">
                                 <div class="icheck-primary">
+                                    <small id="emailHelp" style="color:red;" text-muted><?=$message?></small>
                                     <input type="checkbox" id="remember">
                                     <label for="remember">
                                         Se souvenir de moi
@@ -92,7 +180,8 @@ if (!empty($_POST) && !empty($_POST['NomComplet']) && !empty($_POST['Password'])
                             </div>
                             <!-- /.col -->
                             <div class="col-4">
-                                <button type="submit" class="btn btn-primary btn-block btn-flat">Se connecter</button>
+                                <button type="submit" name="action" value="connect" class="btn btn-primary btn-block btn-flat">Se connecter</button>
+                                <button type="submit" name="action" value="register" class="btn btn-primary btn-block btn-flat">Créer un compte</button>
                             </div>
                             <!-- /.col -->
                         </div>

@@ -1,4 +1,3 @@
-<?php session_start(); ?>
 <?php
 if (!empty($_POST)) {
     
@@ -46,19 +45,12 @@ if (!empty($_POST)) {
     }
 
     if (empty($errors)) {
-        $rep = $pdo->prepare("INSERT INTO inscription SET nomComplet = ?, email = ?, password = ?, passwordRetape = ?, titulaire = ?, numero = ?, confirmation_token = ?");
-        $password = crypt($_POST["Password"]);
-        $passwordRetape = crypt($_POST["PasswordRetape"]);
+        $rep = $pdo->prepare("INSERT INTO inscription SET nomComplet = ?, email = ?, password = ?, passwordRetape = ?, titulaire = ?, numero = ?");
+        $password = $_POST["Password"];
+        $passwordRetape = $_POST["PasswordRetape"];
         //$password = password_hash($_POST["Password"], PASSWORD_BCRYPT);
         //$password = password_hash($_POST["PasswordRetape"], PASSWORD_BCRYPT);
-        $token = str_random(60);
-        debug($token);
-        $rep->execute([$_POST["NomComplet"], $_POST["Email"], $password, $passwordRetape, $_POST["Titulaire"], $_POST["Numero"], $token]);
-        $user_id = $pdo->lastInsertId();
-        mail($_POST["email"], 'Confirmation de votre compte !', "Afin de valider votre compte, merci de cliquer sur ce lien\n\nhttp://localhost/projects/SitePHP/HTML/confirm.php?id=$user_id&token=$token");
-        $_SESSION['flash']['success'] = "Un email de confirmation vous a été envoyé pour valider votre compte";
-        header('Location: login2.php');
-        exit();
+        $rep->execute([$_POST["NomComplet"], $_POST["Email"], $password, $passwordRetape, $_POST["Titulaire"], $_POST["Numero"]]);
     }
 }
 ?>
