@@ -1,3 +1,10 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
 <!DOCTYPE html>
 <html>
     <head>

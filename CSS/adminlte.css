@@ -28220,4 +28220,8 @@ a.text-muted:hover {
   background-color: #ffffff;
   border-color: #dee2e6;
 }
+
+.btn-right{
+    float: right;
+}
 /*# sourceMappingURL=adminlte.css.map */

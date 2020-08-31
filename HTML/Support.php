@@ -1,3 +1,10 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
 <?php
 
 session_start();
@@ -7,7 +14,7 @@ require_once '../HTML/Function.php';
 try
     {
        $bdd = new PDO(
-          'mysql:host=localhost;dbname=amirtagram',
+          'mysql:host=localhost;dbname=gameseek',
           "root",
           "",
           array(

@@ -1,5 +1,12 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
 <?php
-if (!empty($_POST)) {
+if (!empty($_POST)) { // Regarde si on envoie le formulaire avec la méthode POST
     
     require_once '../HTML/Function.php';
     $errors = array();

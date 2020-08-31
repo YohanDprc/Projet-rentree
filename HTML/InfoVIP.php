@@ -1,3 +1,10 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
 <!DOCTYPE html>
 <html lang="fr">
     <title>Games Seek : VIP Info</title>
@@ -39,7 +46,7 @@
                     <h1>En savoir plus sur ce que nous vous proposons !</h1> 
                     <p>Tout d'abord vous recevrez un email à chaque fois que l'ont ajoutent un nouveau jeu.</p><br>
                     <p>Ensuite vous aurez des remises sur certains jeux et recevrez des cadeaux.</p><br>
-                    <p>Alors si vous voulez vous inscrire je vous laisse cliquer <a href="register.php">ici</a>.</p>
+                    <p>Alors si vous voulez vous inscrire je vous laisse cliquer <a href="login.php">ici</a>.</p>
                 </div>
 
                 <div class="w3-padding-64 w3-light-grey w3-small w3-center" id="footer">

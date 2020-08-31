@@ -1,3 +1,36 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
+<?php
+require_once '../HTML/Function.php';
+
+try {
+    $bdd = new PDO(
+            'mysql:host=localhost;dbname=gameseek', "root", "", array(
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false
+            )
+    );
+} catch (Exception $e) {
+    die('Erreur : ' . $e->getMessage());
+}
+
+$res = NULL;
+
+if (!empty($_POST)) {
+    $distri = $_POST["distributeur"];
+    $pegi = $_POST["pegi"];
+    if (empty($distri) && empty($pegi)) {
+        
+    } else {
+        $req = $bdd->query("SELECT * FROM jeu WHERE idDistributeur = $distri  AND idPegi = $pegi;");
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
     <title>Games Seek : Recherche</title>
@@ -37,36 +70,46 @@
                     <div class="w3-test2">
                         <div class="w3-test" style="width: 275px">
                             Choisissez un distributeur de jeux vidéo :
-                            <select required="required" multiple="multiple">
-                                <option value="jeu">Ubisoft</option>
-                                <option value="jeu">Electronic Arts (EA)</option>
-                                <option value="jeu">Bethesda Softworks</option>
-                                <option value="jeu">Activision</option>
-                                <option value="jeu">Blizzard Entertainment</option>
-                                <option value="jeu">Rockstar Games</option>
-                                <option value="jeu">Activision</option>
+                            <select required="required" name="distributeur">
+                                <option value="default">Sélectionner votre distributeur</option>
+                                <option value="1">Ubisoft</option>
+                                <option value="2">Electronic Arts (EA)</option>
+                                <option value="3">Bethesda Softworks</option>
+                                <option value="4">Activision</option>
+                                <option value="5">Blizzard Entertainment</option>
+                                <option value="6">Rockstar Games</option>
                             </select>
                         </div>
 
                         <div class="w3-test" style="width: 275px">
                             Choisissez un PEGI :
-                            <select required="required" multiple="multiple">
-                                <option value="pegi">3</option>
-                                <option value="pegi">7</option>
-                                <option value="pegi">12</option>
-                                <option value="pegi">16</option>
-                                <option value="pegi">18</option>
+                            <select required="required" name="pegi">
+                                <option value="default">Sélectionner votre PEGI</option>
+                                <option value="1">3</option>
+                                <option value="2">7</option>
+                                <option value="3">12</option>
+                                <option value="4">16</option>
+                                <option value="5">18</option>
                             </select>
                         </div>
 
                         <div class="w3-test" style="width: 275px">
-                            Veuillez écrire votre prix :
-                            <div style="height: 82px;" class="w3-test"><input type="number" name="prix" placeholder="Entrez un prix (sans CHF)" required="required"/></div>
+                            Veuillez écrire votre prix (optionnel):
+                            <div style="height: 82px;" class="w3-test"><input type="number" name="prix" placeholder="Entrez un prix (sans CHF)"/></div>
                         </div>
 
                     </div>
 
                     <button type="submit" name="search" class="w3-button w3-red w3-margin-bottom w3-margin-top">Rechercher un jeu</button>
+                    <?php
+                    if (!empty($_POST)) {
+                        $distri = $_POST["distributeur"];
+                        $pegi = $_POST["pegi"];
+                        foreach ($req as $jeu) {
+                            echo $jeu['nomJeu'] . "<img class=\"tailleImg\" src=\"../" . $jeu['lienImage'] . "\" alt=\"" . $jeu['lienImage'] . "\">";
+                        }
+                    }
+                    ?>
                 </form>
 
                 <div class="w3-padding-64 w3-light-grey w3-small">
@@ -79,7 +122,7 @@
                         </div> 
                     </div>
                 </div>
-                
+
                 <!-- Footer -->
                 <footer class="w3-black w3-center w3-padding-24"><span class="w3-hover">Yohan Duparc - I-DA.P2C - CFPT Informatique</span></footer>
 

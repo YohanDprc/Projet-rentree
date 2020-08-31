@@ -1,3 +1,10 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
 <?php session_start(); ?>
 <?php
 if (!empty($_POST) && !empty($_POST['NomComplet']) && !empty($_POST['Password'])){

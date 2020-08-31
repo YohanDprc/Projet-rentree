@@ -1,108 +1,101 @@
+<!--
+ * Projet       : Travail de rentrée
+ * Auteur       : Duparc Yohan
+ * Date         : 24/08/2020
+ * Description  : Faire un projet avec HTML/CSS et avec une base de données
+ * Version      : 1.0
+-->
 <?php
 session_start();
 
-    try
-    {
-       $bdd = new PDO(
-          'mysql:host=localhost;dbname=amirtagram',
-          "root",
-          "",
-          array(
-             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-             PDO::ATTR_EMULATE_PREPARES => false
-          )
-       );
-    }
-    catch(Exception $e)
-    {
-            die('Erreur : '.$e->getMessage());
-    }
+try {
+    $bdd = new PDO(
+            'mysql:host=localhost;dbname=gameseek', "root", "", array(
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false
+            )
+    );
+} catch (Exception $e) {
+    die('Erreur : ' . $e->getMessage());
+}
 
 //Création des variables de la session
-if(!isset($_SESSION['userList'])){
+if (!isset($_SESSION['userList'])) {
     $_SESSION['pseudo'] = "";
     $_SESSION['isConnected'] = false;
     $_SESSION['password'] = [];
-  }
+}
 
 //Récuperation des données
 
-$action = filter_input(INPUT_POST,"action");
-$pseudo = filter_input(INPUT_POST,"pseudo");
-$password = filter_input(INPUT_POST,"password");
+$action = filter_input(INPUT_POST, "action");
+$pseudo = filter_input(INPUT_POST, "pseudo");
+$password = filter_input(INPUT_POST, "password");
 //-------------------------------------------------
 
 $message = "";
 
 
-if($action == "connect"){
-  
-  if($pseudo != "" && $password != ""){
-    $sql = "SELECT * FROM user";
-    $reponse = $bdd->prepare($sql);
-    $reponse->execute();
+if ($action == "connect") {
+
+    if ($pseudo != "" && $password != "") {
+        $sql = "SELECT * FROM user";
+        $reponse = $bdd->prepare($sql);
+        $reponse->execute();
 
 
 
 
 
-    if (($res = $reponse->fetch()) == false) {
-      echo "lol";
-  } else {
-      do {
-          if($pseudo == $res['pseudo'] && $password == $res['password']){
-            $_SESSION['pseudo'] = $res['pseudo'];
-            $_SESSION['isConnected'] = true;
-            $_SESSION['password'] = $res['password'];
-            $_SESSION['userId'] = $res['iduser'];
+        if (($res = $reponse->fetch()) == false) {
+            
+        } else {
+            do {
+                if ($pseudo == $res['pseudo'] && $password == $res['password']) {
+                    $_SESSION['pseudo'] = $res['pseudo'];
+                    $_SESSION['isConnected'] = true;
+                    $_SESSION['password'] = $res['password'];
+                    $_SESSION['userId'] = $res['iduser'];
 
-            $repConnect = $bdd->prepare('UPDATE user SET isConnected = true WHERE iduser = :userId');
-            $repConnect->execute(array(
-              'userId' => $_SESSION['userId']
-              ));
-
-            header("Location: http://localhost/projects/SitePHP/Accueil.php");
-
-          }
-          else{
-            $message = "Entrée inorrect";
-          }
-      } while ($res = $reponse->fetch());
-  }
-  }
-  else{
-    $message = "Entrée inorrect";
-  }
-  
-}
-else if($action == "register"){
-
-
-
-  if($pseudo != "" && $password != ""){
-    $req = $bdd->prepare('SELECT pseudo FROM user WHERE pseudo= :Pseudo');
-
-    $req->execute(array(
-      'Pseudo' => $pseudo,
-      ));
-    
-    if ($donnees = $req->fetch())
-    {
-        $message = "Il y a déjà une personne qui utilise $pseudo comme pseudo !";
+                    $repConnect = $bdd->prepare('UPDATE user SET isConnected = true WHERE iduser = :userId');
+                    $repConnect->execute(array(
+                        'userId' => $_SESSION['userId']
+                    ));
+                    header("Location: account.php");
+                } else {
+                    if (($pseudo == $res['pseudo'] && $password != $res['password']) || ($pseudo != $res['pseudo'] && $password == $res['password'])) {
+                        $message = "Entré incorrect";
+                    } elseif ($pseudo != $res['pseudo'] && $password != $res['password']) {
+                        $message = "Entré incorrect";
+                    }
+                }
+            } while ($res = $reponse->fetch());
+        }
     }
-    else
-    {
-      $req = $bdd->prepare('INSERT INTO user(pseudo, password) VALUES(:pseudo, :password)');
-    
-      $req->execute(array(
-        'pseudo' => $pseudo,
-        'password' => $password
+} else if ($action == "register") {
+
+
+
+    if ($pseudo != "" && $password != "") {
+        $req = $bdd->prepare('SELECT pseudo FROM user WHERE pseudo= :Pseudo');
+
+        $req->execute(array(
+            'Pseudo' => $pseudo,
         ));
-        $message = "Compte crée";
+
+        if ($donnees = $req->fetch()) {
+            $message = "Il y a déjà une personne qui utilise $pseudo comme pseudo !";
+        } else {
+            $req = $bdd->prepare('INSERT INTO user(pseudo, password) VALUES(:pseudo, :password)');
+
+            $req->execute(array(
+                'pseudo' => $pseudo,
+                'password' => $password
+            ));
+            $message = "Compte crée";
+        }
     }
 }
-}
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -133,24 +126,25 @@ else if($action == "register"){
             <br><?php if (!empty($errors)):endif; ?>
             <div>
                 <ul>
-                    <?php
-                            if (empty($errors)) {
-                                
-                            } else {?>
-                            <p>Vous avez mal remplis le formulaire !</p>
-                            <?php
-                                foreach ($errors as $error) {
-                                    debug($error);
-                                }
-                            }
-                            ?>
+<?php
+if (empty($errors)) {
+    
+} else {
+    ?>
+                        <p>Vous avez mal remplis le formulaire !</p>
+    <?php
+    foreach ($errors as $error) {
+        debug($error);
+    }
+}
+?>
                 </ul>
             </div>
             <!-- /.login-logo -->
             <div class="card">
                 <div class="card-body login-card-body">
                     <p class="login-box-msg">Connexion à un compte</p>
-
+                    <small id="emailHelp" style="color:red;" text-muted><?= $message ?></small>
                     <form id="login" action="" method="post">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" name="pseudo" placeholder="Pseudo" required="required">
@@ -169,15 +163,15 @@ else if($action == "register"){
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-8">
-                                <div class="icheck-primary">
-                                    <small id="emailHelp" style="color:red;" text-muted><?=$message?></small>
-                                    <input type="checkbox" id="remember">
-                                    <label for="remember">
-                                        Se souvenir de moi
-                                    </label>
-                                </div>
-                            </div>
+                            <!--                            <div class="col-8">
+                                                            <div class="icheck-primary">
+                                                                
+                                                                <input type="checkbox" id="remember">
+                                                                <label for="remember">
+                                                                    Se souvenir de moi
+                                                                </label>
+                                                            </div>
+                                                        </div>-->
                             <!-- /.col -->
                             <div class="col-4">
                                 <button type="submit" name="action" value="connect" class="btn btn-primary btn-block btn-flat">Se connecter</button>
@@ -191,9 +185,6 @@ else if($action == "register"){
                         <p>- OU -</p>
                     </div>
 
-                    <p class="mb-0">
-                        <a href="register.php" class="text-center">Enregistrer un nouveau membre</a>
-                    </p>
                 </div>
                 <!-- /.login-card-body -->
             </div>
